@@ -24,11 +24,6 @@ struct ContentView: View {
             
             List
             {
-                Section("Your score is: ")
-                {
-                    Text("\(score)")
-                        .foregroundColor(.blue)
-                }
                 Section
                 {
                     TextField("Enter your word", text: $newWord)
@@ -64,6 +59,15 @@ struct ContentView: View {
                 Button("New Game" , action: newGame)
                     .foregroundColor(.red)
             }
+            .safeAreaInset(edge: .bottom)
+            {
+                Text("Score: \(score)")
+                       .frame(maxWidth: .infinity)
+                       .padding()
+                       .background(.blue)
+                       .foregroundColor(.white)
+                       .font(.headline)
+            }
         }
     }
     
@@ -82,6 +86,8 @@ extension ContentView
         let answer = newWord.lowercased().trimmingCharacters(in: .whitespacesAndNewlines)
         
         guard answer.count > 0 else {return}
+        
+        
         
         
         guard isOriginal(word: answer) else
@@ -109,25 +115,17 @@ extension ContentView
             
         }
         
-        switch answer.count
+        if answer == rootWord
         {
-        case 4:
-            score += 4
-        case 5:
-            score += 5
-        case 6:
-            score += 6
-        case 7:
-            score += 7
-        default:
-            score += 3
+            wordError(title: "Word not possible", message: "Cannot use the starting word!")
+            return
         }
-        
         
         withAnimation
         {
             usedWords.insert(answer, at: 0)
             newWord = ""
+            score(answer: answer)
         }
     }
     
@@ -193,9 +191,28 @@ extension ContentView
     func newGame()
     {
         score = 0
+        newWord = ""
         usedWords.removeAll()
         startGame()
     }
     
+    func score(answer: String) -> Int {
+        switch answer.count
+        {
+        case 4:
+            score += 4
+        case 5:
+            score += 5
+        case 6:
+            score += 6
+        case 7:
+            score += 7
+        default:
+            score += 3
+        }
+        
+        return score
+        
+    }
 }
 
